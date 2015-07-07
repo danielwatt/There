@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="text_color">#B6B6C2</color>
+    <color name="main_bg_color">#3B3B7C</color>
+    <color name="highlight_color">#ACACD6</color>
+
+    <style name="ThereTheme" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:windowBackground">@color/main_bg_color</item>
+    </style>
+</resources>
