@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expandableListView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="5"
+    android:orientation="vertical"
+    android:weightSum="1"
+    >
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:divider="@drawable/list_divider"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        android:dividerPadding="22dp">
+
+
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:drawableLeft="@drawable/placeholderimage"
+            android:drawablePadding="@dimen/textbuttonPadding"
+            android:text="addressText"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/textSize" />
+
+        <TextView
+            android:id="@+id/ringToneText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawableLeft="@drawable/placeholderimage"
+            android:drawablePadding="@dimen/textbuttonPadding"
+            android:text="ringToneText"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/textSize" />
+
+        <CheckBox
+            android:id="@+id/repeatchbx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:button="@drawable/chbxselector"
+            android:checked="false"
+            android:paddingStart="@dimen/textbuttonPadding"
+            android:text="Stay on after each ring"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/textSize"
+            android:focusable="false"/>
+
+        <CheckBox
+            android:id="@+id/vibratechbx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:button="@drawable/chbxselector"
+            android:checked="false"
+            android:paddingStart="@dimen/textbuttonPadding"
+            android:text="Vibrate"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/textSize"
+            android:focusable="false"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_marginTop="15dp"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:background="@drawable/list_divider"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_marginTop="15dp"
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:orientation="horizontal"
+        android:layout_weight="0.05">
+
+        <Button
+            android:layout_width="@dimen/chbxsize"
+            android:layout_height="@dimen/chbxsize"
+            android:background="@drawable/placeholderimage"
+            android:id="@+id/deleteButton"
+            android:focusable="false"
+            android:layout_marginBottom="15dp"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="text_color">#B6B6C2</color>
+    <color name="text_color">#EDEDED</color>
     <color name="main_bg_color">#3B3B7C</color>
     <color name="highlight_color">#ACACD6</color>
+    <color name="selected_button">#00abe5</color>
+    <color name="unselected_button">#808080</color>
+    <color name="white">#FFFFFF</color>
+    <color name="divider">#8989b0</color>
+    <color name="secondary_bg_color">#6b6bb6</color>
+    <dimen name="chbxsize">15dp</dimen>
+    <dimen name="tracklength">25dp</dimen>
+    <dimen name="textSize">20dp</dimen>
+    <dimen name="textbuttonPadding">25dp</dimen>
 
     <style name="ThereTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <item name="android:windowBackground">@color/main_bg_color</item>
