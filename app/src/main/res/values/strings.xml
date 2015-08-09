@@ -3,6 +3,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="gps_network_not_enabled">This application require Location Services. Would you like to enable it?</string>
+    <string name="open_location_settings">Enable</string>
+    <string name="Cancel">Cancel</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

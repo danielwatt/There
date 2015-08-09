@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'ThereKey'
+            keyPassword 'breeze'
+            storeFile file('D:/Programs/AndroidStudioProjects/keystore/android.jks')
+            storePassword 'breeze'
+        }
+    }
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc2"
-
+    buildToolsVersion "23.0.0 rc3"
     defaultConfig {
         applicationId "com.daniel.dwatt.there"
         minSdkVersion 21
@@ -15,10 +22,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.google.android.gms:play-services:7.5.0'
 }

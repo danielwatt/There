@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:state_focused="true"
-        android:state_pressed="true"
-        android:drawable="@color/highlight_color" />
-    <item
-        android:state_focused="true"
-        android:state_pressed="false"
-        android:drawable="@color/secondary_bg_color" />
-    <item
-        android:state_focused="false"
-        android:state_pressed="true"
-        android:drawable="@color/highlight_color" />
-    <item
-        android:drawable="@color/main_bg_color" />
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:exitFadeDuration="@android:integer/config_shortAnimTime">
+    <item android:drawable="@color/group_select_color"    android:state_pressed="true" android:state_activated="false"/>
+    <item android:drawable="@color/secondary_bg_color" android:state_activated="true"/>
+    <item android:drawable="@color/main_bg_color"      android:state_activated="false"/>
+
 </selector>

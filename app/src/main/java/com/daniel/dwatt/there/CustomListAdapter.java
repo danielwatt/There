@@ -13,16 +13,21 @@ import android.widget.TextView;
 import android.widget.CheckBox;
 import android.widget.Switch;
 import android.view.View.OnTouchListener;
+import android.view.MotionEvent;
+import java.util.HashMap;
+import com.daniel.dwatt.there.AnimatedExpandableListView;
+import com.daniel.dwatt.there.AnimatedExpandableListView.AnimatedExpandableListAdapter;
 
 
-public class CustomListAdapter extends BaseExpandableListAdapter {
+
+public class CustomListAdapter extends AnimatedExpandableListAdapter {
 
     private LayoutInflater inflater;
-    private ArrayList<ChildObject> childItems;
+    private HashMap<GroupObject,ChildObject> childItems;
     private ArrayList<GroupObject> groupItems;
     private Context context;
 
-    public CustomListAdapter(ArrayList<GroupObject> groupItems, ArrayList<ChildObject> childItems, Context context){
+    public CustomListAdapter(ArrayList<GroupObject> groupItems, HashMap<GroupObject,ChildObject> childItems, Context context){
         this.groupItems = groupItems;
         this.childItems = childItems;
         this.context = context;
@@ -50,29 +55,12 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
         cityText.setText(groupItems.get(groupPosition).getCityText());
         alarmSwitch.setChecked(groupItems.get(groupPosition).isAlarmOn());
 
-        if (isExpanded)
-        {
-            convertView.setBackgroundColor(context.getResources().getColor(R.color.secondary_bg_color));
-
-        }
-        else
-        {
-            convertView.setBackgroundColor(context.getResources().getColor(R.color.main_bg_color));
-        }
-
-        convertView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.setBackgroundColor(context.getResources().getColor(R.color.highlight_color));
-                return false;
-            }
-        });
         return convertView;
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
+    public View getRealChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        final ChildObject childObj = getChild(groupPosition, childPosition);
         if (convertView == null){
             convertView = inflater.inflate(R.layout.customlistview_child, parent, false);
         }
@@ -82,20 +70,10 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
         CheckBox vibratechbx = (CheckBox) convertView.findViewById(R.id.vibratechbx);
         CheckBox repeatchbx = (CheckBox) convertView.findViewById(R.id.repeatchbx);
 
-        addressText.setText(childItems.get(childPosition).getAddressText());
-        ringToneText.setText(childItems.get(childPosition).getRingToneText());
-        vibratechbx.setChecked(childItems.get(childPosition).isVibrateOn());
-        repeatchbx.setChecked(childItems.get(childPosition).isRepeatOn());
-
-        convertView.setBackgroundColor(context.getResources().getColor(R.color.secondary_bg_color));
-
-        convertView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.setBackgroundColor(context.getResources().getColor(R.color.highlight_color));
-                return false;
-            }
-        });
+        addressText.setText(childObj.getAddressText());
+        ringToneText.setText(childObj.getRingToneText());
+        vibratechbx.setChecked(childObj.isVibrateOn());
+        repeatchbx.setChecked(childObj.isRepeatOn());
 
         return convertView;
     }
@@ -107,9 +85,9 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
+    public int getRealChildrenCount(int groupPosition) {
 
-        return this.childItems.size();
+        return 1;
     }
 
     @Override
@@ -121,7 +99,7 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
     @Override
     public ChildObject getChild(int groupPosition, int childPosition) {
 
-        return groupItems.get(groupPosition).getChildObject();
+        return this.childItems.get(this.groupItems.get(groupPosition));
     }
 
     @Override
@@ -141,5 +119,6 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
 
         return childPosition;
     }
+
 
 }

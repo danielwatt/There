@@ -1,62 +1,93 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_columnWeight="1"
+    android:id="@+id/main_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".MainActivity"
-    android:weightSum="2"
+    android:layout_columnWeight="1"
+    android:orientation="vertical"
     android:padding="0dp"
-    android:id="@+id/main_layout"
-    android:orientation="vertical">
+    android:weightSum="2"
+    tools:context=".MainActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_columnWeight="1"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    tools:context=".MainActivity"
-    android:weightSum="2"
-    android:padding="0dp"
-    android:id="@+id/button_layout">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/button_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_columnWeight="1"
+        android:padding="0dp"
+        android:weightSum="2"
+        tools:context=".MainActivity">
 
-    <Button
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/alarm_buttom_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="0dp"
+            tools:context=".MainActivity">
 
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:text="ALARM"
-        android:textColor="@color/text_color"
-        android:id="@+id/alarm_button"
-        android:background="@drawable/ripple_button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_weight="1" />
+            <ImageButton
+                android:id="@+id/alarm_button"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/ripple_button"
+                android:src="@drawable/alarmclock"
+                android:tint="@color/secondary_text_color"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:textColor="@color/text_color"
-        android:text="MAP"
-        android:id="@+id/map_button"
-        android:layout_weight="1"
-        android:background="@drawable/ripple_button"/>
+        </RelativeLayout>
 
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map_buttom_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="0dp"
+            tools:context=".MainActivity">
+
+            <ImageButton
+                android:id="@+id/map_button"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/ripple_button"
+                android:src="@drawable/treasuremap"
+                android:tint="@color/secondary_text_color"/>
+
+
+        </RelativeLayout>
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
         android:id="@+id/fragment_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:padding="0dp">
 
 
         <fragment
+            android:id="@+id/alarmFragment"
+            android:name="com.daniel.dwatt.there.ExpandableListFragment"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:name="com.daniel.dwatt.there.ExpandableListFragment"
-            android:id="@+id/fragment"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="center_vertical"
-            tools:layout="@layout/fragment_expandable_list_view"
-            android:layout_alignParentEnd="true" />
+            tools:layout="@layout/fragment_expandable_list_view" />
+
+        <fragment
+            android:id="@+id/mapFragment"
+            android:name="com.daniel.dwatt.there.MainMapFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            tools:layout="@layout/fragment_main_map"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
+
+
     </RelativeLayout>
 
 </LinearLayout>

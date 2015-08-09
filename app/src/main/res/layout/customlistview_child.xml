@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="5"
+    android:background="@color/secondary_bg_color"
     android:orientation="vertical"
-    android:weightSum="1"
-    >
+    android:weightSum="1">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/list"
@@ -15,84 +15,145 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:divider="@drawable/list_divider"
+        android:dividerPadding="22dp"
         android:orientation="vertical"
-        android:showDividers="middle"
-        android:dividerPadding="22dp">
+        android:showDividers="middle">
 
-
-        <TextView
-            android:id="@+id/addressText"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:drawableLeft="@drawable/placeholderimage"
-            android:drawablePadding="@dimen/textbuttonPadding"
-            android:text="addressText"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/text_color"
-            android:textSize="@dimen/textSize" />
+            android:layout_marginTop="10dp">
 
-        <TextView
-            android:id="@+id/ringToneText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/placeholderimage"
-            android:drawablePadding="@dimen/textbuttonPadding"
-            android:text="ringToneText"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/text_color"
-            android:textSize="@dimen/textSize" />
+            <ImageView
+                android:id="@+id/mapdrawable"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/map"
+                android:backgroundTint="@color/text_color" />
 
-        <CheckBox
-            android:id="@+id/repeatchbx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:button="@drawable/chbxselector"
-            android:checked="false"
-            android:paddingStart="@dimen/textbuttonPadding"
-            android:text="Stay on after each ring"
-            android:textColor="@color/text_color"
-            android:textSize="@dimen/textSize"
-            android:focusable="false"/>
+            <TextView
+                android:id="@+id/addressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@+id/mapdrawable"
+                android:paddingLeft="@dimen/textbuttonPadding"
+                android:paddingTop="2dp"
+                android:text="addressText"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/textSize" />
 
-        <CheckBox
-            android:id="@+id/vibratechbx"
-            android:layout_width="wrap_content"
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:button="@drawable/chbxselector"
-            android:checked="false"
-            android:paddingStart="@dimen/textbuttonPadding"
-            android:text="Vibrate"
-            android:textColor="@color/text_color"
-            android:textSize="@dimen/textSize"
-            android:focusable="false"/>
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:id="@+id/alarmdrawable"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/alarm"
+                android:backgroundTint="@color/text_color" />
+
+            <TextView
+                android:id="@+id/ringToneText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/alarmdrawable"
+                android:paddingLeft="@dimen/textbuttonPadding"
+                android:paddingTop="2dp"
+                android:text="ringToneText"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/textSize" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <CheckBox
+                android:id="@+id/repeatchbx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:focusable="false"
+/>
+
+            <TextView
+                android:id="@+id/repeattext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@+id/repeatchbx"
+                android:paddingLeft="@dimen/textbuttonPadding"
+                android:paddingTop="2dp"
+                android:text="Stay on after ring"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/textSize" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <CheckBox
+                android:id="@+id/vibratechbx"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:checked="false"
+                android:focusable="false" />
+
+            <TextView
+                android:id="@+id/vibratetext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="@dimen/textbuttonPadding"
+                android:paddingTop="2dp"
+                android:text="Vibrate"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/textSize"
+                android:layout_alignTop="@+id/vibratechbx"
+                android:layout_toEndOf="@+id/vibratechbx" />
+        </RelativeLayout>
 
     </LinearLayout>
 
     <View
-        android:layout_marginTop="15dp"
         android:layout_width="fill_parent"
         android:layout_height="1px"
-        android:background="@drawable/list_divider"/>
+        android:layout_marginTop="15dp"
+        android:background="@drawable/list_divider" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_marginTop="15dp"
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.05"
         android:orientation="horizontal"
-        android:layout_weight="0.05">
+        android:weightSum="1">
 
         <Button
-            android:layout_width="@dimen/chbxsize"
-            android:layout_height="@dimen/chbxsize"
-            android:background="@drawable/placeholderimage"
             android:id="@+id/deleteButton"
-            android:focusable="false"
-            android:layout_marginBottom="15dp"/>
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/trash"
+            android:backgroundTint="@color/text_color"
+            android:focusable="false" />
     </LinearLayout>
 </LinearLayout>

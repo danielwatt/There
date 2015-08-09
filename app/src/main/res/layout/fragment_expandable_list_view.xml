@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,12 +6,25 @@
     tools:context="com.daniel.dwatt.there.ExpandableListView">
 
 
-    <ExpandableListView
+    <com.daniel.dwatt.there.AnimatedExpandableListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/elv"
         android:layout_weight="1"
+        android:choiceMode="singleChoice"
         android:divider="@drawable/list_divider" android:dividerHeight="1px"
         android:childDivider="@color/secondary_bg_color"
         />
-</LinearLayout>
+
+    <ImageButton
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/plussign"
+        android:tint="@color/white"
+        android:id="@+id/addAlarmButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:elevation="6dp"
+        android:background="@drawable/circle_button"/>
+</RelativeLayout>
