@@ -31,7 +31,26 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
+
+        <activity
+            android:name=".EditorActivity" android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <!-- Points to searchable meta data -->
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+
+        <provider
+            android:name=".PlaceProvider"
+            android:authorities="com.daniel.dwatt.there.PlaceProvider"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

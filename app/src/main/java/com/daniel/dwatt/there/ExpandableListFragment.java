@@ -138,7 +138,7 @@ public class ExpandableListFragment extends Fragment {
         addAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activityCommander.LaunchPopUpEditor();
+                activityCommander.LaunchEditor();
             }
         });
     }
@@ -171,7 +171,7 @@ public class ExpandableListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface ExpandableListViewListener {
-        public void LaunchPopUpEditor();
+        public void LaunchEditor();
     }
 
     public static void expand(final View v) {

@@ -31,7 +31,7 @@
             <ImageButton
                 android:id="@+id/alarm_button"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:background="@drawable/ripple_button"
@@ -52,7 +52,7 @@
             <ImageButton
                 android:id="@+id/map_button"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:background="@drawable/ripple_button"
                 android:src="@drawable/treasuremap"
                 android:tint="@color/secondary_text_color"/>

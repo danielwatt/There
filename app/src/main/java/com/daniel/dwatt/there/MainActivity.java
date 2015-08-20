@@ -5,10 +5,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff.Mode;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -18,16 +17,17 @@ import android.view.View.OnClickListener;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.PopupWindow;
+
+import com.google.android.gms.maps.model.LatLng;
 
 
-public class MainActivity extends Activity implements ExpandableListFragment.ExpandableListViewListener {
+public class MainActivity extends Activity implements ExpandableListFragment.ExpandableListViewListener, MainMapFragment.MainMapListener {
 
-    PopupWindow popUpEditor;
     boolean gps_enabled = false;
     boolean network_enabled = false;
+    LatLng savedLatLngLoc;
+
 
 
     @Override
@@ -35,9 +35,7 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isGPSEnabled();
-
-        popUpEditor = new PopupWindow(this);
+        checkGPSEnabled();
 
         FragmentManager fm = getFragmentManager();
         addFragmentMenuListener(R.id.alarm_button, R.id.map_button, fm.findFragmentById(R.id.alarmFragment), fm.findFragmentById(R.id.mapFragment));
@@ -96,7 +94,7 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_search) {
             return true;
         }
 
@@ -106,11 +104,19 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
     @Override
     protected void onResume() {
         super.onResume();
-        if (!gps_enabled && !network_enabled)
-            isGPSEnabled();
+        if (!gps_enabled && !network_enabled) {
+            checkGPSEnabled();
+        }
+
+        SharedPreferences prefs = getSharedPreferences(
+                "SavedLocation", Context.MODE_PRIVATE);
+
+        savedLatLngLoc = new LatLng(getDouble(prefs, "SavedLat", 0), getDouble(prefs,"SavedLong", 0));
+
+
     }
 
-    protected void isGPSEnabled() {
+    protected void checkGPSEnabled() {
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         try {
@@ -147,7 +153,44 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
 
     //Gets called by ExpandableListFragment when user clicks addAlarmButton
     @Override
-    public void LaunchPopUpEditor() {
+    public void LaunchEditor() {
+        Intent editorIntent = new Intent(this, EditorActivity.class);
+        startActivity(editorIntent);
 
     }
+
+    @Override
+    public void setSavedLocation(LatLng savedLatLngLoc) {
+        this.savedLatLngLoc = savedLatLngLoc;
+    }
+
+    @Override
+    public LatLng getSavedLocation() {
+        return savedLatLngLoc;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (savedLatLngLoc != null) {
+            SharedPreferences prefs = getSharedPreferences(
+                    "SavedLocation", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = prefs.edit();
+            putDouble(editor, "SavedLat", savedLatLngLoc.latitude);
+            putDouble(editor, "SavedLong", savedLatLngLoc.longitude);
+            editor.apply();
+        }
+    }
+
+    private SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
+        return edit.putLong(key, Double.doubleToRawLongBits(value));
+    }
+
+    private double getDouble(final SharedPreferences prefs, final String key, final double defaultValue) {
+        return Double.longBitsToDouble(prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
+    }
+
+
 }

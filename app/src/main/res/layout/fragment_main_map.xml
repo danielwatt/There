@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    >
 
     <fragment
         android:name="com.google.android.gms.maps.MapFragment"
@@ -10,4 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-</LinearLayout>
+    <ImageButton
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:id="@+id/myCurLocButton"
+        android:background="@drawable/purple_ripple_circle_button"
+        android:src="@drawable/mylocation"
+        android:tint="@color/white"
+        android:elevation="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="12dp" />
+
+
+</RelativeLayout>

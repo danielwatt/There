@@ -4,6 +4,7 @@
     <color name="text_color">#EDEDED</color>
     <color name="secondary_text_color">#a8a8a8</color>
     <color name="main_bg_color">#3B3B7C</color>
+    <color name="transparent_bg_color">#333B3B7C</color>
     <color name="highlight_color">#ACACD6</color>
     <color name="selected_button">#00abe5</color>
     <color name="unselected_button">#808080</color>
@@ -13,7 +14,7 @@
     <color name="group_select_color">#555591</color>
     <color name="circle_button_color">#ff1919</color>
     <color name="red_highlight_color">#ffb2b2</color>
-    <color name="popup_window_color">#3f3f3f</color>
+    <color name="checkmark_color">#5fc042</color>
     <dimen name="chbxsize">15dp</dimen>
     <dimen name="tracklength">25dp</dimen>
     <dimen name="textSize">20dp</dimen>
