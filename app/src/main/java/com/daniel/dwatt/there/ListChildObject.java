@@ -1,13 +1,13 @@
 package com.daniel.dwatt.there;
 
-public class ChildObject {
+public class ListChildObject {
     private String addressText;
     private String ringToneText;
     private boolean vibrateOn;
     private boolean repeatOn;
 
 
-    public ChildObject (String addressText, String ringToneText, boolean repeatOn, boolean vibrateOn)
+    public ListChildObject(String addressText, String ringToneText, boolean repeatOn, boolean vibrateOn)
     {
         this.addressText = addressText;
         this.ringToneText = ringToneText;

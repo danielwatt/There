@@ -1,7 +1,6 @@
 package com.daniel.dwatt.there;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -31,8 +30,8 @@ public class ExpandableListFragment extends Fragment {
     private int lastExpandedPosition = -1;
 
 
-    private HashMap<GroupObject, ChildObject> childItems;
-    private ArrayList<GroupObject> groupItems;
+    private HashMap<ListGroupObject, ListChildObject> childItems;
+    private ArrayList<ListGroupObject> groupItems;
 
     //Interface
     private ExpandableListViewListener activityCommander;
@@ -56,21 +55,21 @@ public class ExpandableListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         //Temporary. Eventually read from MySQL DB. Just for testing purposes
-        groupItems = new ArrayList<GroupObject>();
-        groupItems.add(new GroupObject("Title 1", "City 1", true));
-        groupItems.add(new GroupObject("Title 2", "City 2", false));
-        groupItems.add(new GroupObject("Title 3", "City 3", true));
-        groupItems.add(new GroupObject("Title 4", "City 4", true));
-        groupItems.add(new GroupObject("Title 5", "City 5", true));
-        groupItems.add(new GroupObject("Title 6", "City 6", true));
+        groupItems = new ArrayList<ListGroupObject>();
+        groupItems.add(new ListGroupObject("Title 1", "City 1", true));
+        groupItems.add(new ListGroupObject("Title 2", "City 2", false));
+        groupItems.add(new ListGroupObject("Title 3", "City 3", true));
+        groupItems.add(new ListGroupObject("Title 4", "City 4", true));
+        groupItems.add(new ListGroupObject("Title 5", "City 5", true));
+        groupItems.add(new ListGroupObject("Title 6", "City 6", true));
 
-        childItems = new HashMap<GroupObject, ChildObject>();
-        childItems.put(groupItems.get(0), new ChildObject("Address 1", "Ringtone 1", true, false));
-        childItems.put(groupItems.get(1), new ChildObject("Address 2", "Ringtone 2", false, true));
-        childItems.put(groupItems.get(2), new ChildObject("Address 3", "Ringtone 3", false, false));
-        childItems.put(groupItems.get(3), new ChildObject("Address 4", "Ringtone 4", false, false));
-        childItems.put(groupItems.get(4), new ChildObject("Address 5", "Ringtone 5", false, false));
-        childItems.put(groupItems.get(5), new ChildObject("Address 6", "Ringtone 6", false, false));
+        childItems = new HashMap<ListGroupObject, ListChildObject>();
+        childItems.put(groupItems.get(0), new ListChildObject("Address 1", "Ringtone 1", true, false));
+        childItems.put(groupItems.get(1), new ListChildObject("Address 2", "Ringtone 2", false, true));
+        childItems.put(groupItems.get(2), new ListChildObject("Address 3", "Ringtone 3", false, false));
+        childItems.put(groupItems.get(3), new ListChildObject("Address 4", "Ringtone 4", false, false));
+        childItems.put(groupItems.get(4), new ListChildObject("Address 5", "Ringtone 5", false, false));
+        childItems.put(groupItems.get(5), new ListChildObject("Address 6", "Ringtone 6", false, false));
     }
 
     @Override

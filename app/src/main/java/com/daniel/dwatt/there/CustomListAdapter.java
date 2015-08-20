@@ -1,21 +1,17 @@
 package com.daniel.dwatt.there;
 
 import java.util.ArrayList;
-import android.app.Activity;
+
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.CheckBox;
 import android.widget.Switch;
-import android.view.View.OnTouchListener;
-import android.view.MotionEvent;
+
 import java.util.HashMap;
-import com.daniel.dwatt.there.AnimatedExpandableListView;
+
 import com.daniel.dwatt.there.AnimatedExpandableListView.AnimatedExpandableListAdapter;
 
 
@@ -23,11 +19,11 @@ import com.daniel.dwatt.there.AnimatedExpandableListView.AnimatedExpandableListA
 public class CustomListAdapter extends AnimatedExpandableListAdapter {
 
     private LayoutInflater inflater;
-    private HashMap<GroupObject,ChildObject> childItems;
-    private ArrayList<GroupObject> groupItems;
+    private HashMap<ListGroupObject,ListChildObject> childItems;
+    private ArrayList<ListGroupObject> groupItems;
     private Context context;
 
-    public CustomListAdapter(ArrayList<GroupObject> groupItems, HashMap<GroupObject,ChildObject> childItems, Context context){
+    public CustomListAdapter(ArrayList<ListGroupObject> groupItems, HashMap<ListGroupObject,ListChildObject> childItems, Context context){
         this.groupItems = groupItems;
         this.childItems = childItems;
         this.context = context;
@@ -60,7 +56,7 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
 
     @Override
     public View getRealChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final ChildObject childObj = getChild(groupPosition, childPosition);
+        final ListChildObject childObj = getChild(groupPosition, childPosition);
         if (convertView == null){
             convertView = inflater.inflate(R.layout.customlistview_child, parent, false);
         }
@@ -97,7 +93,7 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
     }
     
     @Override
-    public ChildObject getChild(int groupPosition, int childPosition) {
+    public ListChildObject getChild(int groupPosition, int childPosition) {
 
         return this.childItems.get(this.groupItems.get(groupPosition));
     }
