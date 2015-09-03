@@ -18,7 +18,8 @@
     <dimen name="chbxsize">15dp</dimen>
     <dimen name="tracklength">25dp</dimen>
     <dimen name="textSize">20dp</dimen>
-    <dimen name="textbuttonPadding">25dp</dimen>
+    <dimen name="miniTextSize">15dp</dimen>
+    <dimen name="textbuttonPadding">20dp</dimen>
 
 
     <style name="ThereTheme" parent="android:Theme.Holo.Light.NoActionBar">

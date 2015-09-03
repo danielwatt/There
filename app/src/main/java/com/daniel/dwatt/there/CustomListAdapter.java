@@ -1,11 +1,19 @@
 package com.daniel.dwatt.there;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.CheckBox;
 import android.widget.Switch;
@@ -15,19 +23,20 @@ import java.util.HashMap;
 import com.daniel.dwatt.there.AnimatedExpandableListView.AnimatedExpandableListAdapter;
 
 
-
 public class CustomListAdapter extends AnimatedExpandableListAdapter {
 
     private LayoutInflater inflater;
-    private HashMap<ListGroupObject,ListChildObject> childItems;
+    private HashMap<ListGroupObject, ListChildObject> childItems;
     private ArrayList<ListGroupObject> groupItems;
     private Context context;
+    private Intent serviceIntent;
 
-    public CustomListAdapter(ArrayList<ListGroupObject> groupItems, HashMap<ListGroupObject,ListChildObject> childItems, Context context){
+    public CustomListAdapter(ArrayList<ListGroupObject> groupItems, HashMap<ListGroupObject, ListChildObject> childItems, Context context) {
         this.groupItems = groupItems;
         this.childItems = childItems;
         this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        startAlarmService();
     }
 
     @Override
@@ -37,39 +46,145 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+    public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        if (convertView == null){
+        if (convertView == null) {
             convertView = inflater.inflate(R.layout.customlistview_group, parent, false);
         }
 
-        TextView titleText = (TextView) convertView.findViewById(R.id.titleText);
-        TextView cityText = (TextView) convertView.findViewById(R.id.cityText);
-        Switch alarmSwitch = (Switch) convertView.findViewById(R.id.alarmSwitch);
+        final TextView titleText = (TextView) convertView.findViewById(R.id.titleText);
+        final TextView cityText = (TextView) convertView.findViewById(R.id.cityText);
+        final Switch alarmSwitch = (Switch) convertView.findViewById(R.id.alarmSwitch);
 
         titleText.setText(groupItems.get(groupPosition).getTitleText());
         cityText.setText(groupItems.get(groupPosition).getCityText());
         alarmSwitch.setChecked(groupItems.get(groupPosition).isAlarmOn());
 
+        titleText.setMaxLines(1);
+        alarmSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = alarmSwitch.isChecked();
+                groupItems.get(groupPosition).setAlarmOn(isChecked);
+
+                try {
+                    AlarmDataSource dataSource;
+                    dataSource = new AlarmDataSource(context);
+                    dataSource.Open();
+                    dataSource.setAlarmOn(groupItems.get(groupPosition).getAlarm(), isChecked);
+                    dataSource.Close();
+                    notifyDataSetChanged();
+                    startAlarmService();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+
         return convertView;
     }
 
     @Override
-    public View getRealChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getRealChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final ListChildObject childObj = getChild(groupPosition, childPosition);
-        if (convertView == null){
+        if (convertView == null) {
             convertView = inflater.inflate(R.layout.customlistview_child, parent, false);
         }
         /*Initializing objects in child*/
-        TextView addressText = (TextView) convertView.findViewById(R.id.addressText);
-        TextView ringToneText = (TextView) convertView.findViewById(R.id.ringToneText);
-        CheckBox vibratechbx = (CheckBox) convertView.findViewById(R.id.vibratechbx);
-        CheckBox repeatchbx = (CheckBox) convertView.findViewById(R.id.repeatchbx);
+        final TextView addressText = (TextView) convertView.findViewById(R.id.addressText);
+        final TextView ringToneText = (TextView) convertView.findViewById(R.id.ringToneText);
+        final CheckBox vibratechbx = (CheckBox) convertView.findViewById(R.id.vibratechbx);
+        final CheckBox repeatchbx = (CheckBox) convertView.findViewById(R.id.repeatchbx);
 
         addressText.setText(childObj.getAddressText());
         ringToneText.setText(childObj.getRingToneText());
         vibratechbx.setChecked(childObj.isVibrateOn());
         repeatchbx.setChecked(childObj.isRepeatOn());
+
+        RelativeLayout repeatLayout = (RelativeLayout) convertView.findViewById(R.id.repeatLayout);
+        repeatLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                repeatchbx.toggle();
+                boolean isChecked = repeatchbx.isChecked();
+                childItems.get(groupItems.get(groupPosition)).setRepeatOn(isChecked);
+
+                try {
+                    AlarmDataSource dataSource;
+                    dataSource = new AlarmDataSource(context);
+                    dataSource.Open();
+                    dataSource.setRepeatOn(groupItems.get(groupPosition).getAlarm(), isChecked);
+                    dataSource.Close();
+                    notifyDataSetChanged();
+                    startAlarmService();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        RelativeLayout vibrateLayout = (RelativeLayout) convertView.findViewById(R.id.vibrateLayout);
+        vibrateLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vibratechbx.toggle();
+                boolean isChecked = vibratechbx.isChecked();
+                childItems.get(groupItems.get(groupPosition)).setVibrateOn(isChecked);
+
+                try {
+                    AlarmDataSource dataSource;
+                    dataSource = new AlarmDataSource(context);
+                    dataSource.Open();
+                    dataSource.setVibrateOn(groupItems.get(groupPosition).getAlarm(), isChecked);
+                    dataSource.Close();
+                    notifyDataSetChanged();
+                    startAlarmService();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setMessage("Do you wish to delete '" + groupItems.get(groupPosition).getTitleText() + "'");
+                dialog.setPositiveButton(context.getResources().getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+
+                        try {
+                            AlarmDataSource dataSource;
+                            dataSource = new AlarmDataSource(context);
+                            dataSource.Open();
+                            dataSource.deleteAlarm(groupItems.get(groupPosition).getAlarm());
+                            dataSource.Close();
+                            groupItems.remove(groupPosition);
+                            notifyDataSetChanged();
+                            startAlarmService();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                });
+                dialog.show();
+
+
+            }
+        });
+
 
         return convertView;
     }
@@ -91,7 +206,7 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
 
         return false;
     }
-    
+
     @Override
     public ListChildObject getChild(int groupPosition, int childPosition) {
 
@@ -114,6 +229,10 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
     public long getChildId(int groupPosition, int childPosition) {
 
         return childPosition;
+    }
+
+    private void startAlarmService() {
+        context.startService(new Intent(context,AlarmService.class));
     }
 
 

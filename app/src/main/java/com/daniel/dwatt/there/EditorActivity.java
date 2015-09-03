@@ -5,9 +5,11 @@ import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -36,20 +38,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class EditorActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    MapFragment mapFrag;
-    GoogleMap mGoogleMap;
-    List<Marker> tempMarkerList = new ArrayList<Marker>();
-    Circle markerCircle = null;
-    Marker marker = null;
-    ScaleGestureDetector scaleGestureDetector;
-    GestureDetector gestureDetector;
-    LocationObject locationObject = null;
+    private MapFragment mapFrag;
+    private GoogleMap mGoogleMap;
+    private List<Marker> tempMarkerList = new ArrayList<Marker>();
+    private Circle markerCircle = null;
+    private Marker marker = null;
+    private ScaleGestureDetector scaleGestureDetector;
+    private GestureDetector gestureDetector;
+    private LocationObject locationObject = null;
+    private AlarmDataSource dataSource;
+    private LatLng currentLatLngLoc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,19 +151,77 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
         setLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (locationObject != null)
-                {
+                if (locationObject != null) {
+                    try {
+                        dataSource = new AlarmDataSource(getBaseContext());
+                        dataSource.Open();
+                        Alarm alarm = LocationObjectToAlarm(locationObject);
+                        dataSource.AddAlarm(alarm);
+                        dataSource.Close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
                     Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(mainIntent);
-                }
-                else
-                {
+                } else {
                     Toast.makeText(getBaseContext(), "Set a location first!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        mGoogleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location location) {
 
+                currentLatLngLoc = new LatLng(location.getLatitude(), location.getLongitude());
+            }
+        });
+
+        ImageButton editor_myCurLocButton = (ImageButton) findViewById(R.id.editor_myCurLocButton);
+        editor_myCurLocButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLatLngLoc != null) {
+                    CameraUpdate currentLoc = CameraUpdateFactory.newLatLngZoom(currentLatLngLoc, 13);
+                    mGoogleMap.animateCamera(currentLoc);
+                } else {
+                    Toast.makeText(getBaseContext(), "Current location unknown", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences(
+
+                "SavedLocation", Context.MODE_PRIVATE);
+
+        currentLatLngLoc = new LatLng(getDouble(prefs, "SavedLat", 0), getDouble(prefs,"SavedLong", 0));
+
+        if (currentLatLngLoc.latitude != 0 && currentLatLngLoc.longitude != 0)
+        {
+            CameraUpdate savedLoc = CameraUpdateFactory.newLatLngZoom(currentLatLngLoc, 13);
+            mGoogleMap.animateCamera(savedLoc);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (currentLatLngLoc != null) {
+            SharedPreferences prefs = getSharedPreferences(
+                    "SavedLocation", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = prefs.edit();
+            putDouble(editor, "SavedLat", currentLatLngLoc.latitude);
+            putDouble(editor, "SavedLong", currentLatLngLoc.longitude);
+            editor.apply();
+        }
     }
 
     private void setTransparentLayoutVisibility() {
@@ -177,6 +240,8 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
         transparentLayoutForGesture.setFocusable(true);
         transparentLayoutForGesture.setFocusableInTouchMode(true);
         transparentLayoutForGesture.requestFocus();
+        ImageButton editor_myCurLocButton = (ImageButton) findViewById(R.id.editor_myCurLocButton);
+        editor_myCurLocButton.setClickable(false);
     }
 
     private void hideTransparentLayoutVisibility() {
@@ -185,6 +250,9 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
 
         actionBarText.setText(R.string.actionBarTextDefault);
         transparentLayoutForGesture.setVisibility(View.GONE);
+
+        ImageButton editor_myCurLocButton = (ImageButton) findViewById(R.id.editor_myCurLocButton);
+        editor_myCurLocButton.setClickable(true);
     }
 
 
@@ -366,5 +434,21 @@ private class SingleTapConfirm extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 }
+
+    private Alarm LocationObjectToAlarm (LocationObject locationObject){
+        Alarm alarm = new Alarm();
+        AlarmObject alarmObject = new AlarmObject(locationObject,"default address here",true, true, true);
+        alarm.setAlarmObject(alarmObject);
+
+        return alarm;
+    }
+
+    private SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
+        return edit.putLong(key, Double.doubleToRawLongBits(value));
+    }
+
+    private double getDouble(final SharedPreferences prefs, final String key, final double defaultValue) {
+        return Double.longBitsToDouble(prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
+    }
 
 }

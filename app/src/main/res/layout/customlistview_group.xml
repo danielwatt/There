@@ -8,13 +8,15 @@
 
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="320dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/titleText"
                 android:text="titleText"
                 android:textColor="@color/text_color"
                 android:textSize="50dp"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:paddingLeft="15dp"/>
 
             <Switch
@@ -43,6 +45,8 @@
             android:textSize="20dp"
             android:paddingLeft="15dp"
             android:paddingBottom="15dp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:layout_below="@+id/titleText"
             android:layout_alignParentStart="true"
             android:layout_weight="3" />

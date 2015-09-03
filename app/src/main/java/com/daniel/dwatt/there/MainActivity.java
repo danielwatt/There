@@ -21,13 +21,17 @@ import android.widget.ImageButton;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.sql.SQLException;
+import java.util.List;
+
 
 public class MainActivity extends Activity implements ExpandableListFragment.ExpandableListViewListener, MainMapFragment.MainMapListener {
 
-    boolean gps_enabled = false;
-    boolean network_enabled = false;
-    LatLng savedLatLngLoc;
-
+    private boolean gps_enabled = false;
+    private boolean network_enabled = false;
+    private LatLng savedLatLngLoc;
+    private AlarmDataSource dataSource;
+    private List<Alarm> listAlarm;
 
 
     @Override
@@ -39,6 +43,8 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
 
         FragmentManager fm = getFragmentManager();
         addFragmentMenuListener(R.id.alarm_button, R.id.map_button, fm.findFragmentById(R.id.alarmFragment), fm.findFragmentById(R.id.mapFragment));
+
+        
 
     }
 
@@ -77,6 +83,18 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
                 ft.commit();
             }
         });
+
+        try{
+            dataSource = new AlarmDataSource(this);
+            dataSource.Open();
+            listAlarm = dataSource.GetAllAlarms();
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+
+
     }
 
     @Override
@@ -112,7 +130,6 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
                 "SavedLocation", Context.MODE_PRIVATE);
 
         savedLatLngLoc = new LatLng(getDouble(prefs, "SavedLat", 0), getDouble(prefs,"SavedLong", 0));
-
 
     }
 
@@ -153,10 +170,15 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
 
     //Gets called by ExpandableListFragment when user clicks addAlarmButton
     @Override
-    public void LaunchEditor() {
+    public void launchEditor() {
         Intent editorIntent = new Intent(this, EditorActivity.class);
         startActivity(editorIntent);
 
+    }
+
+    @Override
+    public List<Alarm> queryAlarmList() {
+        return listAlarm;
     }
 
     @Override
@@ -191,6 +213,5 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
     private double getDouble(final SharedPreferences prefs, final String key, final double defaultValue) {
         return Double.longBitsToDouble(prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
     }
-
 
 }

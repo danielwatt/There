@@ -4,11 +4,15 @@ package com.daniel.dwatt.there;
 import com.google.android.gms.maps.model.LatLng;
 
 public class LocationObject {
-    String address;
-    String locality;
-    String shortname;
-    LatLng latLng;
-    double radius;
+    private String address;
+    private String locality;
+    private String shortname;
+    private LatLng latLng;
+    private double radius;
+
+    public LocationObject(){
+
+    }
 
     public LocationObject(String address, String locality, LatLng latLng, double radius) {
         this.address = address;

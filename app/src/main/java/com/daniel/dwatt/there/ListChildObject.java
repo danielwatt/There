@@ -7,6 +7,7 @@ public class ListChildObject {
     private boolean repeatOn;
 
 
+
     public ListChildObject(String addressText, String ringToneText, boolean repeatOn, boolean vibrateOn)
     {
         this.addressText = addressText;
@@ -14,6 +15,7 @@ public class ListChildObject {
         this.repeatOn = repeatOn;
         this.vibrateOn = vibrateOn;
     }
+
 
     public String getAddressText() {
 
@@ -52,4 +54,5 @@ public class ListChildObject {
 
         this.ringToneText = ringToneText;
     }
+
 }

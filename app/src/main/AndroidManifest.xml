@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.daniel.dwatt.there" >
+    package="com.daniel.dwatt.there">
 
     <permission
         android:name="com.google.maps.android.utils.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature"/>
-    <uses-permission android:name="com.google.maps.android.utils.permission.MAPS_RECEIVE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.google.maps.android.utils.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
+        android:required="true" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/ThereTheme" >
+        android:theme="@style/ThereTheme">
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,15 +38,17 @@
         </activity>
 
         <activity
-            android:name=".EditorActivity" android:launchMode="singleTop">
+            android:name=".EditorActivity"
+            android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
             <!-- Points to searchable meta data -->
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
         <provider
@@ -52,9 +56,21 @@
             android:authorities="com.daniel.dwatt.there.PlaceProvider"
             android:exported="false" />
 
+        <receiver android:name="com.daniel.dwatt.there.AlarmManagerHelper">
+            <intent-filter>
+                <action android:name="com.daniel.dwatt.there.ACTION_REFRESH_SCHEDULE_ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.daniel.dwatt.there.AlarmService"
+            android:enabled="true">
+        </service>
+
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAVjzmkc13r3RDEC_VCPg5lMeiGRWdLt4g"/>
+            android:value="AIzaSyAVjzmkc13r3RDEC_VCPg5lMeiGRWdLt4g" />
     </application>
 
 </manifest>

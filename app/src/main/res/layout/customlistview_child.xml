@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginTop="0dp"
         android:divider="@drawable/list_divider"
         android:dividerPadding="22dp"
         android:orientation="vertical"
@@ -22,7 +22,7 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="6dp">
 
             <ImageView
                 android:id="@+id/mapdrawable"
@@ -39,18 +39,20 @@
                 android:layout_gravity="center_vertical"
                 android:layout_toEndOf="@+id/mapdrawable"
                 android:paddingLeft="@dimen/textbuttonPadding"
-                android:paddingTop="2dp"
+                android:paddingTop="5dp"
                 android:text="addressText"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/text_color"
-                android:textSize="@dimen/textSize" />
+                android:textSize="@dimen/miniTextSize" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="6dp">
 
             <ImageView
                 android:id="@+id/alarmdrawable"
@@ -66,53 +68,61 @@
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@+id/alarmdrawable"
                 android:paddingLeft="@dimen/textbuttonPadding"
-                android:paddingTop="2dp"
+                android:paddingTop="5dp"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:text="ringToneText"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/text_color"
-                android:textSize="@dimen/textSize" />
+                android:textSize="@dimen/miniTextSize" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="6dp"
+            android:id="@+id/repeatLayout">
 
             <CheckBox
                 android:id="@+id/repeatchbx"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:checked="false"
                 android:focusable="false"
+                android:clickable="false"
 />
 
             <TextView
                 android:id="@+id/repeattext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:layout_gravity="center_vertical"
                 android:layout_toEndOf="@+id/repeatchbx"
+                android:layout_alignTop="@+id/repeatchbx"
                 android:paddingLeft="@dimen/textbuttonPadding"
-                android:paddingTop="2dp"
-                android:text="Stay on after ring"
+                android:paddingTop="5dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="Repeat"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/text_color"
-                android:textSize="@dimen/textSize" />
+                android:textSize="@dimen/miniTextSize" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="6dp"
+            android:id="@+id/vibrateLayout">
 
             <CheckBox
                 android:id="@+id/vibratechbx"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:checked="false"
-                android:focusable="false" />
+                android:focusable="false"
+                android:clickable="false"/>
 
             <TextView
                 android:id="@+id/vibratetext"
@@ -120,11 +130,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="@dimen/textbuttonPadding"
-                android:paddingTop="2dp"
+                android:paddingTop="5dp"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:text="Vibrate"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/text_color"
-                android:textSize="@dimen/textSize"
+                android:textSize="@dimen/miniTextSize"
                 android:layout_alignTop="@+id/vibratechbx"
                 android:layout_toEndOf="@+id/vibratechbx" />
         </RelativeLayout>
@@ -147,13 +159,14 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <Button
+        <ImageButton
             android:id="@+id/deleteButton"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/trash"
-            android:backgroundTint="@color/text_color"
+            android:background="@color/secondary_bg_color"
+            android:src="@drawable/trash"
+            android:tint="@color/text_color"
             android:focusable="false" />
     </LinearLayout>
 </LinearLayout>

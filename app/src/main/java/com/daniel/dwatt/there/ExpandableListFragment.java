@@ -1,16 +1,21 @@
 package com.daniel.dwatt.there;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
@@ -28,6 +33,8 @@ public class ExpandableListFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private AnimatedExpandableListView elv;
     private int lastExpandedPosition = -1;
+    private AlarmDataSource dataSource;
+    private List<Alarm> listAlarm;
 
 
     private HashMap<ListGroupObject, ListChildObject> childItems;
@@ -53,23 +60,7 @@ public class ExpandableListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Temporary. Eventually read from MySQL DB. Just for testing purposes
-        groupItems = new ArrayList<ListGroupObject>();
-        groupItems.add(new ListGroupObject("Title 1", "City 1", true));
-        groupItems.add(new ListGroupObject("Title 2", "City 2", false));
-        groupItems.add(new ListGroupObject("Title 3", "City 3", true));
-        groupItems.add(new ListGroupObject("Title 4", "City 4", true));
-        groupItems.add(new ListGroupObject("Title 5", "City 5", true));
-        groupItems.add(new ListGroupObject("Title 6", "City 6", true));
-
-        childItems = new HashMap<ListGroupObject, ListChildObject>();
-        childItems.put(groupItems.get(0), new ListChildObject("Address 1", "Ringtone 1", true, false));
-        childItems.put(groupItems.get(1), new ListChildObject("Address 2", "Ringtone 2", false, true));
-        childItems.put(groupItems.get(2), new ListChildObject("Address 3", "Ringtone 3", false, false));
-        childItems.put(groupItems.get(3), new ListChildObject("Address 4", "Ringtone 4", false, false));
-        childItems.put(groupItems.get(4), new ListChildObject("Address 5", "Ringtone 5", false, false));
-        childItems.put(groupItems.get(5), new ListChildObject("Address 6", "Ringtone 6", false, false));
+        updateAlarmList();
     }
 
     @Override
@@ -87,6 +78,7 @@ public class ExpandableListFragment extends Fragment {
         elv.setAdapter(elAdapter);
         elv.setGroupIndicator(null);
 
+
         elv.setOnGroupClickListener(new OnGroupClickListener() {
 
             @Override
@@ -99,6 +91,7 @@ public class ExpandableListFragment extends Fragment {
                 } else {
                     elv.expandGroupWithAnimation(groupPosition);
                 }
+                elv.refreshDrawableState();
                 return true;
             }
 
@@ -128,6 +121,7 @@ public class ExpandableListFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 elv.collapseGroupWithAnimation(groupPosition);
+                elv.refreshDrawableState();
                 return true;
             }
         });
@@ -137,7 +131,7 @@ public class ExpandableListFragment extends Fragment {
         addAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activityCommander.LaunchEditor();
+                activityCommander.launchEditor();
             }
         });
     }
@@ -170,7 +164,14 @@ public class ExpandableListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface ExpandableListViewListener {
-        public void LaunchEditor();
+        public void launchEditor();
+        public List<Alarm> queryAlarmList();
+    }
+
+    @Nullable
+    @Override
+    public View getView() {
+        return super.getView();
     }
 
     public static void expand(final View v) {
@@ -222,6 +223,39 @@ public class ExpandableListFragment extends Fragment {
         // 1dp/ms
         a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
+    }
+
+    private void updateAlarmList(){
+
+        try{
+            dataSource = new AlarmDataSource(getActivity());
+            dataSource.Open();
+            listAlarm = dataSource.GetAllAlarms();
+            dataSource.Close();
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        groupItems = new ArrayList<ListGroupObject>();
+        childItems = new HashMap<ListGroupObject, ListChildObject>();
+        int listSize = 0;
+        if(listAlarm != null) {
+
+           listSize = listAlarm.size();
+        }
+            for (int i = 0; i<listSize; i++)
+        {
+            groupItems.add(new ListGroupObject(listAlarm.get(i).getAlarmObject().getLocationObject().getShortname(),
+                    listAlarm.get(i).getAlarmObject().getLocationObject().getLocality(),
+                    listAlarm.get(i).getAlarmObject().isActive(),listAlarm.get(i)));
+
+            childItems.put(groupItems.get(i), new ListChildObject(listAlarm.get(i).getAlarmObject().getLocationObject().getAddress(),
+                    listAlarm.get(i).getAlarmObject().getRingtoneLocation(),
+                    listAlarm.get(i).getAlarmObject().isRepeat(),
+                    listAlarm.get(i).getAlarmObject().isVibrate()));
+        }
+
     }
 
 
