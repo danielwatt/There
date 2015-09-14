@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff.Mode;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -18,11 +19,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-
-import java.sql.SQLException;
-import java.util.List;
 
 
 public class MainActivity extends Activity implements ExpandableListFragment.ExpandableListViewListener, MainMapFragment.MainMapListener {
@@ -30,8 +29,6 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
     private boolean gps_enabled = false;
     private boolean network_enabled = false;
     private LatLng savedLatLngLoc;
-    private AlarmDataSource dataSource;
-    private List<Alarm> listAlarm;
 
 
     @Override
@@ -42,13 +39,13 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
         checkGPSEnabled();
 
         FragmentManager fm = getFragmentManager();
-        addFragmentMenuListener(R.id.alarm_button, R.id.map_button, fm.findFragmentById(R.id.alarmFragment), fm.findFragmentById(R.id.mapFragment));
+        addFragmentMenuListener(R.id.alarm_button, R.id.map_button, fm.findFragmentById(R.id.alarmFragment), (MainMapFragment) fm.findFragmentById(R.id.mapFragment));
 
         
 
     }
 
-    void addFragmentMenuListener(int abutton, int mbutton, final Fragment afragment, final Fragment mfragment) {
+    void addFragmentMenuListener(int abutton, int mbutton, final Fragment afragment, final MainMapFragment mfragment) {
         final ImageButton alarmButton = (ImageButton) findViewById(abutton);
         final ImageButton mapButton = (ImageButton) findViewById(mbutton);
 
@@ -77,21 +74,13 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
                 mapButton.setColorFilter(getResources().getColor(R.color.text_color), Mode.SRC_IN);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 //Temporary
+                mfragment.setAlarmMarkers();
                 ft.show(mfragment);
                 ft.hide(afragment);
 
                 ft.commit();
             }
         });
-
-        try{
-            dataSource = new AlarmDataSource(this);
-            dataSource.Open();
-            listAlarm = dataSource.GetAllAlarms();
-        }catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
 
 
 
@@ -126,6 +115,26 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
             checkGPSEnabled();
         }
 
+        Intent intent = getIntent();
+        String newLocationString = intent.getStringExtra("com.daniel.dwatt.there.newlocation");
+        String editLocationStringOld = intent.getStringExtra("com.daniel.dwatt.there.editlocationold");
+        String editLocationStringNew = intent.getStringExtra("com.daniel.dwatt.there.editlocationnew");
+        int editLocationRadius   = intent.getIntExtra("com.daniel.dwatt.there.editlocationradius", 0);
+
+        if (newLocationString != null){
+            Toast.makeText(this, newLocationString + " added!",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if (editLocationStringOld != null && editLocationStringNew != null){
+            Toast.makeText(this, editLocationStringOld + " is now " + editLocationStringNew + "!",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if (editLocationStringOld != null && editLocationRadius != 0){
+            Toast.makeText(this, editLocationStringOld + " now has a radius of " + editLocationRadius + "m!",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+
         SharedPreferences prefs = getSharedPreferences(
                 "SavedLocation", Context.MODE_PRIVATE);
 
@@ -155,6 +164,7 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                     Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(myIntent);
+                    finish();
                 }
             });
             dialog.setNegativeButton(this.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
@@ -173,12 +183,8 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
     public void launchEditor() {
         Intent editorIntent = new Intent(this, EditorActivity.class);
         startActivity(editorIntent);
+        finish();
 
-    }
-
-    @Override
-    public List<Alarm> queryAlarmList() {
-        return listAlarm;
     }
 
     @Override
@@ -205,6 +211,7 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
             editor.apply();
         }
     }
+
 
     private SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit, final String key, final double value) {
         return edit.putLong(key, Double.doubleToRawLongBits(value));

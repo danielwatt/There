@@ -3,6 +3,8 @@ package com.daniel.dwatt.there;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
@@ -35,6 +37,8 @@ public class ExpandableListFragment extends Fragment {
     private int lastExpandedPosition = -1;
     private AlarmDataSource dataSource;
     private List<Alarm> listAlarm;
+    private Context context;
+    private CustomListAdapter elAdapter;
 
 
     private HashMap<ListGroupObject, ListChildObject> childItems;
@@ -42,6 +46,25 @@ public class ExpandableListFragment extends Fragment {
 
     //Interface
     private ExpandableListViewListener activityCommander;
+
+    public void callRingtonePicker(int position){
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        this.startActivityForResult(intent, position);
+    }
+
+    @Override
+    public void onActivityResult(int groupPosition, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && groupPosition >= 0)
+        {
+            super.onActivityResult(groupPosition, resultCode, data);
+            Uri newRingtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            elAdapter.updateAlarmRingTone(groupPosition,newRingtone);
+
+        }
+    }
 
     public static ExpandableListFragment newInstance(String param1, String param2) {
         ExpandableListFragment fragment = new ExpandableListFragment();
@@ -72,7 +95,7 @@ public class ExpandableListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CustomListAdapter elAdapter = new CustomListAdapter(groupItems, childItems, getActivity());
+        elAdapter = new CustomListAdapter(groupItems, childItems, getActivity(),this);
         elv = (AnimatedExpandableListView) view.findViewById(R.id.elv);
         elv.setIndicatorBounds(elv.getRight() - 40, elv.getWidth());
         elv.setAdapter(elAdapter);
@@ -165,7 +188,6 @@ public class ExpandableListFragment extends Fragment {
      */
     public interface ExpandableListViewListener {
         public void launchEditor();
-        public List<Alarm> queryAlarmList();
     }
 
     @Nullable
@@ -251,10 +273,12 @@ public class ExpandableListFragment extends Fragment {
                     listAlarm.get(i).getAlarmObject().isActive(),listAlarm.get(i)));
 
             childItems.put(groupItems.get(i), new ListChildObject(listAlarm.get(i).getAlarmObject().getLocationObject().getAddress(),
-                    listAlarm.get(i).getAlarmObject().getRingtoneLocation(),
+                    listAlarm.get(i).getAlarmObject().getRingtoneTitle(),
                     listAlarm.get(i).getAlarmObject().isRepeat(),
                     listAlarm.get(i).getAlarmObject().isVibrate()));
         }
+
+
 
     }
 

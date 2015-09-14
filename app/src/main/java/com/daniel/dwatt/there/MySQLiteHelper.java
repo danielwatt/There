@@ -19,9 +19,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_REPEAT = "repeat";
     public static final String COLUMN_VIBRATE = "vibrate";
     public static final String COLUMN_ACTIVE = "active";
+    public static final String COLUMN_INFENCE = "inFence";
+    public static final String COLUMN_RINGTONETITLE = "ringtonetitle";
 
     private static final String DATABASE_NAME = "alarm.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,7 +42,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 + COLUMN_RINGTONELOCATION + " text not null, "
                 + COLUMN_REPEAT + " integer, "
                 + COLUMN_VIBRATE + " integer, "
-                + COLUMN_ACTIVE + " integer);";
+                + COLUMN_ACTIVE + " integer, "
+                + COLUMN_INFENCE + " integer,"
+                + COLUMN_RINGTONETITLE + " text not null);";
 
         db.execSQL(query);
     }

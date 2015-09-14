@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.LoaderManager;
 import android.content.Loader;
@@ -55,6 +57,7 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
     private LocationObject locationObject = null;
     private AlarmDataSource dataSource;
     private LatLng currentLatLngLoc;
+    private Alarm editAlarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +77,26 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
         mGoogleMap.getUiSettings().setCompassEnabled(false);
         mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
         handleIntent(getIntent());
+
+        editAlarm = getIntent().getParcelableExtra("com.daniel.dwatt.there.alarmedit");
+
+        if (editAlarm != null) {
+            locationObject = editAlarm.getAlarmObject().getLocationObject();
+
+            LatLng position = locationObject.getLatLng();
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(position);
+            markerOptions.title(editAlarm.getAlarmObject().getLocationObject().getShortname());
+            markerOptions.draggable(false);
+            marker = mGoogleMap.addMarker(markerOptions);
+            marker.showInfoWindow();
+            tempMarkerList.add(marker);
+
+            addMarkerCircle(position);
+
+            enableSetLocationButton();
+        }
 
 
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -151,21 +174,54 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
         setLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (locationObject != null) {
+
+                if (editAlarm != null) {
+                    AlarmDataSource dataSource = new AlarmDataSource(getBaseContext());
                     try {
-                        dataSource = new AlarmDataSource(getBaseContext());
                         dataSource.Open();
-                        Alarm alarm = LocationObjectToAlarm(locationObject);
-                        dataSource.AddAlarm(alarm);
+                        dataSource.setLocation(editAlarm, locationObject.getLatLng());
+                        dataSource.setLocality(editAlarm, locationObject.getLocality());
+                        dataSource.setAddress(editAlarm, locationObject.getAddress());
+                        dataSource.setRadius(editAlarm, locationObject.getRadius());
+                        dataSource.setShortName(editAlarm, locationObject.getShortname());
                         dataSource.Close();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
 
                     Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+
+                    mainIntent.putExtra("com.daniel.dwatt.there.editlocationold", editAlarm.getAlarmObject().getLocationObject().getShortname());
+
+                    if (editAlarm.getAlarmObject().getLocationObject().getShortname().equals(locationObject.getShortname())) {
+
+                        mainIntent.putExtra("com.daniel.dwatt.there.editlocationradius", (int) locationObject.getRadius());
+
+                    } else {
+                        mainIntent.putExtra("com.daniel.dwatt.there.editlocationnew", locationObject.getShortname());
+                    }
                     startActivity(mainIntent);
+                    finish();
+
                 } else {
-                    Toast.makeText(getBaseContext(), "Set a location first!", Toast.LENGTH_SHORT).show();
+                    if (locationObject != null) {
+                        Alarm alarm = LocationObjectToAlarm(locationObject);
+                        try {
+                            dataSource = new AlarmDataSource(getBaseContext());
+                            dataSource.Open();
+                            dataSource.AddAlarm(alarm);
+                            dataSource.Close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+                        mainIntent.putExtra("com.daniel.dwatt.there.newlocation", alarm.getAlarmObject().getLocationObject().getShortname());
+                        startActivity(mainIntent);
+                        finish();
+                    } else {
+                        Toast.makeText(getBaseContext(), "Set a location first!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -200,10 +256,9 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
 
                 "SavedLocation", Context.MODE_PRIVATE);
 
-        currentLatLngLoc = new LatLng(getDouble(prefs, "SavedLat", 0), getDouble(prefs,"SavedLong", 0));
+        currentLatLngLoc = new LatLng(getDouble(prefs, "SavedLat", 0), getDouble(prefs, "SavedLong", 0));
 
-        if (currentLatLngLoc.latitude != 0 && currentLatLngLoc.longitude != 0)
-        {
+        if (currentLatLngLoc.latitude != 0 && currentLatLngLoc.longitude != 0 && editAlarm == null) {
             CameraUpdate savedLoc = CameraUpdateFactory.newLatLngZoom(currentLatLngLoc, 13);
             mGoogleMap.animateCamera(savedLoc);
         }
@@ -312,6 +367,7 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
     public void returnToMainActivity(View v) {
         Intent mainActivityIntent = new Intent(this, MainActivity.class);
         startActivity(mainActivityIntent);
+        finish();
     }
 
 
@@ -337,8 +393,7 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
             marker = mGoogleMap.addMarker(markerOptions);
             marker.showInfoWindow();
             double markerCircleRadius = 100;
-            if (locationObject != null)
-            {
+            if (locationObject != null) {
                 markerCircleRadius = locationObject.getRadius();
             }
             locationObject = new LocationObject(c.getString(0), c.getString(3), position, markerCircleRadius);
@@ -382,62 +437,67 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
             ImageButton setLocationButton = (ImageButton) findViewById(R.id.setLocationButton);
             setLocationButton.setColorFilter(getResources().getColor(R.color.checkmark_color), PorterDuff.Mode.SRC_IN);
 
-    }
-}
-
-private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-
-        double markerCircleRadius = markerCircle.getRadius();
-        RelativeLayout transparentLayoutForGesture = (RelativeLayout) findViewById(R.id.transparentLayoutForGesture);
-        if (transparentLayoutForGesture.isFocused() && markerCircle != null) {
-            float scale = 1.f;
-
-            scale *= detector.getScaleFactor();
-            scale = Math.max(0.1f, Math.min(scale, 10.f));
-
-            if (markerCircleRadius < 25 && scale > 1) {
-                markerCircleRadius *= scale * 2;
-            } else {
-                markerCircleRadius *= scale;
-            }
-
-            //Radius minimum limit
-            if (markerCircleRadius < 1) {
-                markerCircleRadius = 1;
-            }
-
-            Circle tempCircle = mGoogleMap.addCircle(new CircleOptions()
-                    .center(markerCircle.getCenter())
-                    .radius(markerCircleRadius)
-                    .strokeColor(R.color.main_bg_color)
-                    .strokeWidth(0)
-                    .fillColor(R.color.transparent_bg_color));
-
-            markerCircle.setRadius(markerCircleRadius);
-            locationObject.setRadius(markerCircleRadius);
-
-            TextView radiusText = (TextView) findViewById(R.id.radiusText);
-
-            radiusText.setText("Alarm Radius: " + (int) markerCircleRadius + "m");
-            tempCircle.remove();
-
         }
-        return true;
     }
-}
 
-private class SingleTapConfirm extends GestureDetector.SimpleOnGestureListener {
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return true;
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+
+            double markerCircleRadius = markerCircle.getRadius();
+            RelativeLayout transparentLayoutForGesture = (RelativeLayout) findViewById(R.id.transparentLayoutForGesture);
+            if (transparentLayoutForGesture.isFocused() && markerCircle != null) {
+                float scale = 1.f;
+
+                scale *= detector.getScaleFactor();
+                scale = Math.max(0.1f, Math.min(scale, 10.f));
+
+                if (markerCircleRadius < 25 && scale > 1) {
+                    markerCircleRadius *= scale * 2;
+                } else {
+                    markerCircleRadius *= scale;
+                }
+
+                //Radius minimum limit
+                if (markerCircleRadius < 1) {
+                    markerCircleRadius = 1;
+                }
+
+                Circle tempCircle = mGoogleMap.addCircle(new CircleOptions()
+                        .center(markerCircle.getCenter())
+                        .radius(markerCircleRadius)
+                        .strokeColor(R.color.main_bg_color)
+                        .strokeWidth(0)
+                        .fillColor(R.color.transparent_bg_color));
+
+                markerCircle.setRadius(markerCircleRadius);
+                locationObject.setRadius(markerCircleRadius);
+
+                TextView radiusText = (TextView) findViewById(R.id.radiusText);
+
+                radiusText.setText("Alarm Radius: " + (int) markerCircleRadius + "m");
+                tempCircle.remove();
+
+            }
+            return true;
+        }
     }
-}
 
-    private Alarm LocationObjectToAlarm (LocationObject locationObject){
+    private class SingleTapConfirm extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            return true;
+        }
+    }
+
+    private Alarm LocationObjectToAlarm(LocationObject locationObject) {
         Alarm alarm = new Alarm();
-        AlarmObject alarmObject = new AlarmObject(locationObject,"default address here",true, true, true);
+        String uriRingtoneString = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM).toString();
+        Ringtone mRingtone = RingtoneManager.getRingtone(this, Uri.parse(uriRingtoneString));
+        String ringtoneTitle = mRingtone.getTitle(this);
+        mRingtone.stop();
+
+        AlarmObject alarmObject = new AlarmObject(locationObject, uriRingtoneString, true, true, true, ringtoneTitle);
         alarm.setAlarmObject(alarmObject);
 
         return alarm;

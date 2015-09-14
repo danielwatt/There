@@ -18,17 +18,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public class MainMapFragment extends Fragment implements OnMapReadyCallback {
 
-    MapFragment mainMapFrag;
-    GoogleMap mainMap;
-    LatLng currentLatLngLoc;
-    MainMapListener activityCommander;
+    private MapFragment mainMapFrag;
+    private GoogleMap mainMap;
+    private LatLng currentLatLngLoc;
+    private MainMapListener activityCommander;
+    private AlarmDataSource dataSource;
+    List<Alarm> alarmList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,6 +117,8 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback {
         LatLng savedLatLngLoc;
         savedLatLngLoc = activityCommander.getSavedLocation();
 
+        setAlarmMarkers();
+
         if (savedLatLngLoc != null && (savedLatLngLoc.latitude != 0 && savedLatLngLoc.longitude != 0))
         {
             CameraUpdate savedLoc = CameraUpdateFactory.newLatLngZoom(savedLatLngLoc, 14);
@@ -122,5 +129,48 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback {
     public interface MainMapListener {
         public void setSavedLocation(LatLng currentLatLngLoc);
         public LatLng getSavedLocation();
+    }
+
+    public void setAlarmMarkers(){
+
+        mainMap.clear();
+        updateAlarmList();
+
+        for (Alarm alarm: alarmList){
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(alarm.getAlarmObject().getLocationObject().getLatLng());
+            markerOptions.title(alarm.getAlarmObject().getLocationObject().getShortname());
+            markerOptions.draggable(false);
+            mainMap.addMarker(markerOptions);
+
+            CircleOptions circleOptions = new CircleOptions();
+            circleOptions.center(alarm.getAlarmObject().getLocationObject().getLatLng());
+            circleOptions.radius(alarm.getAlarmObject().getLocationObject().getRadius());
+            circleOptions.strokeWidth(2);
+
+            if (alarm.getAlarmObject().isActive())
+            {
+                circleOptions.strokeColor(R.color.main_bg_color);
+                circleOptions.fillColor(R.color.transparent_bg_color);
+            }
+            else
+            {
+                circleOptions.strokeWidth(1);
+            }
+
+
+            mainMap.addCircle(circleOptions);
+        }
+    }
+
+    private void updateAlarmList(){
+        dataSource = new AlarmDataSource(getActivity());
+        try {
+            dataSource.Open();
+            alarmList = dataSource.GetAllAlarms();
+            dataSource.Close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 }

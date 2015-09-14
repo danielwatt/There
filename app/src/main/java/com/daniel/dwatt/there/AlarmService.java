@@ -15,11 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlarmService extends Service {
-    // An alarm for rising in special times to fire the
-    // pendingIntentList
+
     private AlarmManager alarmManagerPositioning = null;
-    // A PendingIntent for calling a receiver in special times
-    public ArrayList<PendingIntent> pendingIntentList = null;
+    public PendingIntent pendingIntent = null;
 
     @Override
     public void onCreate() {
@@ -28,30 +26,25 @@ public class AlarmService extends Service {
                 getSystemService(Context.ALARM_SERVICE);
     }
 
-    ;
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("Dwattservice", "startcom");
-        cancelAlarm();
-        setAlarm();
-        if (pendingIntentList != null) {
-            int listLength = pendingIntentList.size();
+        cancelPendingIntent();
+        createPendingIntent();
+        if (pendingIntent != null) {
+            try {
 
-            for (int i = 0; i < listLength; i++) {
-                try {
-
-                    long interval = 60 * 1000;
-                    int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
-                    long timetoRefresh = SystemClock.elapsedRealtime();
-                    alarmManagerPositioning.setInexactRepeating(alarmType,
-                            timetoRefresh, interval, pendingIntentList.get(i));
-                } catch (NumberFormatException e) {
-                    Toast.makeText(this,
-                            "error running service: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                }
+                long interval = 30 * 1000;
+                int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
+                long timetoRefresh = SystemClock.elapsedRealtime();
+                alarmManagerPositioning.setInexactRepeating(alarmType,
+                        timetoRefresh, interval, pendingIntent);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this,
+                        "error running service: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
+
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -63,66 +56,26 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
-        cancelAlarm();
-        Log.d("Dwattservice", "destroycom");
+        cancelPendingIntent();
+        Log.d("Dwattservice", "destroy");
     }
 
-    private void setAlarm() {
-        pendingIntentList = new ArrayList<PendingIntent>();
-        try {
-            AlarmDataSource dataSource = new AlarmDataSource(this);
-            dataSource.Open();
-            List<Alarm> alarmList = dataSource.GetAllAlarms();
-            for (Alarm alarm : alarmList)
-            {
-                Log.d("alarm", alarm.getAlarmObject().getLocationObject().getAddress());
-            }
-            dataSource.Close();
-            if (alarmList != null) {
-                for (Alarm alarm : alarmList) {
-                    if (alarm.getAlarmObject().isActive()) {
-                        pendingIntentList.add(createPendingIntent(this, alarm));
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void cancelPendingIntent() {
 
+        if (pendingIntent != null) {
+            this.alarmManagerPositioning.cancel(pendingIntent);
+            Log.d("stopLocation", "cancelPendingIntent ");
+        } else
+            this.alarmManagerPositioning.cancel(PendingIntent.getBroadcast(this,0,new Intent (AlarmManagerHelper.ACTION_REFRESH_SCHEDULE_ALARM), 0));
     }
 
-    private void cancelAlarm() {
-
-        if (pendingIntentList != null) {
-
-            int listLength = pendingIntentList.size();
-
-            for (int i = 0; i < listLength; i++) {
-                this.alarmManagerPositioning.cancel(pendingIntentList.get(i));
-                Log.d("stopLocation", "cancelAlarm " + i);
-            }
-        }
-    }
-
-    private PendingIntent createPendingIntent(Context context, Alarm alarm) {
+    private void createPendingIntent() {
         Intent intentToFire = new Intent(
                 AlarmManagerHelper.ACTION_REFRESH_SCHEDULE_ALARM);
-        intentToFire.putExtra("Alarm Address",
-                alarm.getAlarmObject().getLocationObject().getAddress());
-        intentToFire.putExtra("Alarm Longitude",
-                alarm.getAlarmObject().getLocationObject().getLatLng().longitude);
-        intentToFire.putExtra("Alarm Latitude",
-                alarm.getAlarmObject().getLocationObject().getLatLng().latitude);
-        intentToFire.putExtra("Alarm Radius",
-                alarm.getAlarmObject().getLocationObject().getRadius());
-        intentToFire.putExtra("Alarm Vibrate",
-                alarm.getAlarmObject().isVibrate());
-        intentToFire.putExtra("Alarm Ringtone",
-                alarm.getAlarmObject().getRingtoneLocation());
-        intentToFire.putExtra("Alarm Repeat",
-                alarm.getAlarmObject().isRepeat());
-
-        return PendingIntent.getBroadcast(this, alarm.getid(),
+        intentToFire.putExtra(AlarmManagerHelper.COMMAND,
+                AlarmManagerHelper.SENDER_SRV_POSITIONING);
+        //intentToFire.putParcelableArrayListExtra("com.daniel.dwatt.there.Alarm", activeAlarmList);
+        pendingIntent = PendingIntent.getBroadcast(this, 0,
                 intentToFire, 0);
     }
 }

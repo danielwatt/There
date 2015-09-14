@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -17,6 +20,8 @@ public class AlarmDataSource {
 
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
+    private Context context;
+    //Update this when adding column
     private String[] allColumns = {MySQLiteHelper.COLUMN_ID,
             MySQLiteHelper.COLUMN_ADDRESS,
             MySQLiteHelper.COLUMN_LOCALITY,
@@ -27,10 +32,13 @@ public class AlarmDataSource {
             MySQLiteHelper.COLUMN_RINGTONELOCATION,
             MySQLiteHelper.COLUMN_REPEAT,
             MySQLiteHelper.COLUMN_VIBRATE,
-            MySQLiteHelper.COLUMN_ACTIVE};
+            MySQLiteHelper.COLUMN_ACTIVE,
+            MySQLiteHelper.COLUMN_INFENCE,
+            MySQLiteHelper.COLUMN_RINGTONETITLE};
 
     public AlarmDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
+        this.context = context;
     }
 
     public void Open() throws SQLException {
@@ -54,6 +62,8 @@ public class AlarmDataSource {
         values.put(MySQLiteHelper.COLUMN_REPEAT, alarm.getAlarmObject().isRepeat());//8
         values.put(MySQLiteHelper.COLUMN_VIBRATE, alarm.getAlarmObject().isVibrate());//9
         values.put(MySQLiteHelper.COLUMN_ACTIVE, alarm.getAlarmObject().isActive());//10
+        values.put(MySQLiteHelper.COLUMN_INFENCE, alarm.getAlarmObject().isInFence());//11
+        values.put(MySQLiteHelper.COLUMN_RINGTONETITLE, alarm.getAlarmObject().getRingtoneTitle());//12
 
         database.insert(MySQLiteHelper.TABLE_ALARM, null, values);
     }
@@ -80,6 +90,59 @@ public class AlarmDataSource {
         database.update(MySQLiteHelper.TABLE_ALARM,dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(),null);
     }
 
+    public void setInFenceActive (Alarm alarm, boolean inFenceActive){
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_INFENCE, inFenceActive);
+        database.update(MySQLiteHelper.TABLE_ALARM,dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(),null);
+    }
+
+    public void setRingtoneLocation (Alarm alarm, String uriRingtoneString){
+        Ringtone mRingtone = RingtoneManager.getRingtone(context,Uri.parse(uriRingtoneString));
+        String ringtoneTitle = mRingtone.getTitle(context);
+        mRingtone.stop();
+
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_RINGTONELOCATION, uriRingtoneString);
+        dataToInsert.put(MySQLiteHelper.COLUMN_RINGTONETITLE, ringtoneTitle);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+    public void setLocation(Alarm alarm, LatLng latLng){
+        Double latitude = latLng.latitude;
+        Double longitude = latLng.longitude;
+
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
+        dataToInsert.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+    public void setLocality (Alarm alarm, String locality){
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_LOCALITY, locality);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+    public void setAddress (Alarm alarm, String address){
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_ADDRESS, address);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+    public void setRadius(Alarm alarm, Double radius){
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_RADIUS, radius);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+    public void setShortName(Alarm alarm, String shortName){
+        ContentValues dataToInsert = new ContentValues();
+        dataToInsert.put(MySQLiteHelper.COLUMN_SHORTNAME, shortName);
+        database.update(MySQLiteHelper.TABLE_ALARM, dataToInsert, MySQLiteHelper.COLUMN_ID + " = " + alarm.getid(), null);
+    }
+
+
+
     public List<Alarm> GetAllAlarms() {
         List<Alarm> alarmList = new ArrayList<Alarm>();
 
@@ -101,12 +164,14 @@ public class AlarmDataSource {
         Alarm alarm = new Alarm();
         AlarmObject alarmObject = new AlarmObject();
         LocationObject locationObject = new LocationObject();
-
+        //Everytime you add a column, have to add a set here too.
         alarm.setid(cursor.getInt(0));
         alarmObject.setRingtoneLocation(cursor.getString(7));
         alarmObject.setRepeat(cursor.getInt(8) == 1);
         alarmObject.setVibrate(cursor.getInt(9) == 1);
         alarmObject.setActive(cursor.getInt(10) == 1);
+        alarmObject.setInFence(cursor.getInt(11) == 1);
+        alarmObject.setRingtoneTitle(cursor.getString(12));
 
         locationObject.setAddress(cursor.getString(1));
         locationObject.setLocality(cursor.getString(2));

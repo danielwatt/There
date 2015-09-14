@@ -4,14 +4,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.provider.Settings;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,12 +32,14 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
     private ArrayList<ListGroupObject> groupItems;
     private Context context;
     private Intent serviceIntent;
+    private ExpandableListFragment elfragment;
 
-    public CustomListAdapter(ArrayList<ListGroupObject> groupItems, HashMap<ListGroupObject, ListChildObject> childItems, Context context) {
+    public CustomListAdapter(ArrayList<ListGroupObject> groupItems, HashMap<ListGroupObject, ListChildObject> childItems, Context context, ExpandableListFragment elfragment) {
         this.groupItems = groupItems;
         this.childItems = childItems;
         this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.elfragment = elfragment;
         startAlarmService();
     }
 
@@ -72,6 +76,8 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
                     dataSource = new AlarmDataSource(context);
                     dataSource.Open();
                     dataSource.setAlarmOn(groupItems.get(groupPosition).getAlarm(), isChecked);
+                    //reset inFence after toggling AlarmOn
+                    dataSource.setInFenceActive(groupItems.get(groupPosition).getAlarm(), false);
                     dataSource.Close();
                     notifyDataSetChanged();
                     startAlarmService();
@@ -98,9 +104,28 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
         final CheckBox repeatchbx = (CheckBox) convertView.findViewById(R.id.repeatchbx);
 
         addressText.setText(childObj.getAddressText());
+
         ringToneText.setText(childObj.getRingToneText());
         vibratechbx.setChecked(childObj.isVibrateOn());
         repeatchbx.setChecked(childObj.isRepeatOn());
+
+        RelativeLayout addressLayout = (RelativeLayout) convertView.findViewById(R.id.addressLayout);
+        addressLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editIntent = new Intent(context, EditorActivity.class);
+                editIntent.putExtra("com.daniel.dwatt.there.alarmedit", groupItems.get(groupPosition).getAlarm());
+                context.startActivity(editIntent);
+            }
+        });
+
+        RelativeLayout ringToneLayout = (RelativeLayout) convertView.findViewById(R.id.ringToneLayout);
+        ringToneLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                elfragment.callRingtonePicker(groupPosition);
+            }
+        });
 
         RelativeLayout repeatLayout = (RelativeLayout) convertView.findViewById(R.id.repeatLayout);
         repeatLayout.setOnClickListener(new View.OnClickListener() {
@@ -231,9 +256,35 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
         return childPosition;
     }
 
-    private void startAlarmService() {
-        context.startService(new Intent(context,AlarmService.class));
+    public void updateAlarmRingTone(int groupPosition, Uri uriRingtone) {
+
+        String uriRingtoneString = "None";
+        String ringtoneTitle = uriRingtoneString;
+
+        if (uriRingtone != null) {
+            Ringtone ringtone = RingtoneManager.getRingtone(context, uriRingtone);
+            ringtoneTitle = ringtone.getTitle(context);
+            uriRingtoneString = uriRingtone.toString();
+            ringtone.stop();
+        }
+
+        childItems.get(groupItems.get(groupPosition)).setRingToneText(ringtoneTitle);
+
+        try {
+            AlarmDataSource dataSource;
+            dataSource = new AlarmDataSource(context);
+            dataSource.Open();
+            dataSource.setRingtoneLocation(groupItems.get(groupPosition).getAlarm(), uriRingtoneString);
+            dataSource.Close();
+            notifyDataSetChanged();
+            startAlarmService();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+    private void startAlarmService() {
+        context.startService(new Intent(context, AlarmService.class));
+    }
 
 }

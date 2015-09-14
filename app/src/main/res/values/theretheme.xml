@@ -5,7 +5,7 @@
     <color name="secondary_text_color">#a8a8a8</color>
     <color name="main_bg_color">#3B3B7C</color>
     <color name="transparent_bg_color">#333B3B7C</color>
-    <color name="highlight_color">#ACACD6</color>
+    <color name="super_transparent_bg_color">#113B3B7C</color>
     <color name="selected_button">#00abe5</color>
     <color name="unselected_button">#808080</color>
     <color name="white">#FFFFFF</color>
@@ -13,7 +13,8 @@
     <color name="secondary_bg_color">#6b6bb6</color>
     <color name="group_select_color">#555591</color>
     <color name="circle_button_color">#ff1919</color>
-    <color name="red_highlight_color">#ffb2b2</color>
+    <color name="highlight_color">#77FFFFFF</color>
+    <color name="search_bar_color">#AAFFFFFF</color>
     <color name="checkmark_color">#5fc042</color>
     <dimen name="chbxsize">15dp</dimen>
     <dimen name="tracklength">25dp</dimen>
