@@ -1,5 +1,5 @@
 # There
-AGeo-fencing Alarm app for Android. This application allows you to pick a location as your "alarm" and There will notify you when you arrive close to the "alarm" you set.
+A geo-fencing Alarm app for Android. This application allows you to pick a location as your "alarm" and There will notify you when you arrive close to the "alarm" you set.
 
 ####Main Activity (List of existing alarms)
 <img src="https://github.com/danielwatt/There/blob/master/Screenshots/Screenshot_2015-09-23-22-16-21.png" alt="amain" height="400px">
