@@ -49,26 +49,37 @@ public class CustomListAdapter extends AnimatedExpandableListAdapter {
         return true;
     }
 
+    static class ViewHolderItem {
+        TextView titleText;
+        TextView cityText;
+        Switch alarmSwitch;
+    }
+
     @Override
     public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
+        ViewHolderItem viewHolderItem;
+
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.customlistview_group, parent, false);
+            viewHolderItem = new ViewHolderItem();
+            viewHolderItem.titleText = (TextView) convertView.findViewById(R.id.titleText);
+            viewHolderItem.cityText = (TextView) convertView.findViewById(R.id.cityText);
+            viewHolderItem.alarmSwitch = (Switch) convertView.findViewById(R.id.alarmSwitch);
+
+            convertView.setTag(viewHolderItem);
+        } else {
+            viewHolderItem = (ViewHolderItem) convertView.getTag();
         }
+                viewHolderItem.titleText.setText(groupItems.get(groupPosition).getTitleText());
+                viewHolderItem.cityText.setText(groupItems.get(groupPosition).getCityText());
+                viewHolderItem.alarmSwitch.setChecked(groupItems.get(groupPosition).isAlarmOn());
 
-        final TextView titleText = (TextView) convertView.findViewById(R.id.titleText);
-        final TextView cityText = (TextView) convertView.findViewById(R.id.cityText);
-        final Switch alarmSwitch = (Switch) convertView.findViewById(R.id.alarmSwitch);
-
-        titleText.setText(groupItems.get(groupPosition).getTitleText());
-        cityText.setText(groupItems.get(groupPosition).getCityText());
-        alarmSwitch.setChecked(groupItems.get(groupPosition).isAlarmOn());
-
-        titleText.setMaxLines(1);
-        alarmSwitch.setOnClickListener(new View.OnClickListener() {
+        viewHolderItem.titleText.setMaxLines(1);
+        viewHolderItem.alarmSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = alarmSwitch.isChecked();
+                boolean isChecked = !groupItems.get(groupPosition).isAlarmOn();
                 groupItems.get(groupPosition).setAlarmOn(isChecked);
 
                 try {
