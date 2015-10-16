@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements ExpandableListFragment.Exp
         FragmentManager fm = getFragmentManager();
         addFragmentMenuListener(R.id.alarm_button, R.id.map_button, fm.findFragmentById(R.id.alarmFragment), (MainMapFragment) fm.findFragmentById(R.id.mapFragment));
 
-        
+
 
     }
 
